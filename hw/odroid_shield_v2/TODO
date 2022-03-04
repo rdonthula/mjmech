@@ -1,0 +1,81 @@
+r1 defects
+  * JD connectors on bottom have incorrect part number
+  * Master fuse pads are on top of board instead of bottom
+  * It would be nice to have silks for the odroid IO connector so that
+    I can remember which is which for bringup and test
+  * shore power connector seems to have the switch pin connected up as
+    ground rather than the ground pin
+  * would be nice to have sensing for 5V, 1.8V, and battery rail
+    voltage
+  * silk screen for top facing JST XH connectors is backwards
+  * weapon connector would be better placed in opening further from
+    center so that it is not under the turret when rotated
+
+
+ * update all part numbers based on macrofab run
+
+ * odroid shield for mech
+   * accessible from top
+     * 2x4 0.1" header for aeg/agitator/laser
+     * USB for camera
+     * master power switch
+     * weapon power switch
+     * blinking weapon power light
+     * 5V power light
+     * shore power connector
+     * 12V power for gimbal
+     * data for gimbal
+     * I2C connector
+   * power distribution
+     * input connector/pins for battery
+     * high current fuse
+     * shore power connector for odroid
+       * DPN: CP-034A-ND
+   * 5V buck regulator for odroid
+     * ST1S10  DPN: 497-6904-1-ND
+   * 12V boost for gimbal controller
+     * MIC2253 DPN: 576-3643-6-ND
+   * servo power/data connectors for legs
+   * AEG motor driver - MC33926
+   * agitator motor driver - MC33926
+   * laser control - FET
+   * I2C level shift
+   * Serial level shift
+   * AVR - on I2C bus (or probably serial like we have now)
+   * switches
+      * CKN5001-ND
+      * power
+      * weapon
+   * power light
+   * weapon light
+   * some connection for scoring transponder data... maybe just
+     another herkulex bus connector?
+
+DONE 2015-06-28
+ * Gave useful names to all ICs
+ * do schematic ERC
+ * line up all connectors
+ * route 5V buck
+ * make ground plane
+ * try to line up other parts as best I can
+ * decide on other power planes
+   * 8V and 5V are the likely candidates
+ * route weapon drive
+ * route IMU
+ * route power
+ * first pass at silk sizing and placement before autoroute
+ * label individual pins on headers
+ * bottom chassis plate interferes with bottom USB connector on odroid
+ * ensure connectors have sufficient clearance around top plate
+
+
+DONE 2015-06-27
+ * AVR crystal
+ * Switch servo connectors to something SMT so that it doesn't eat
+   up so much of both sides of the board
+   * I guess JST XH
+ * Switched fuse to SMT
+ * Decided not to bother with 12V up converter for now.  If I build a
+   custom gimbal board, I can put it on there.
+ * Decided not to mess with custom gimbal controller.
+ * IMU - MAX21000 + MMA8451Q

@@ -1,0 +1,1660 @@
+ * Mech warfare
+   * turret
+     * tracking
+       * Try a red/blue target
+       * Try a black/white target with white outer ring, black middle
+         ring, and white center
+       * record training corpus with green/red circle and aruco targets
+       * annotate
+       * measure detection and runtime performance of aruco
+       * try to come up with something better for other system
+
+       * propagate position based on IMU
+         * need calibration of camera FOV vs IMU
+       * change base target position based on range
+       * better response when target drops in and out of view
+       * add D term
+       * report up size of detection in addition to location
+       * see how barrel interferes with detection
+       * add a way to tweak where relative to automatic track we are aiming
+         * maybe re-interpret rates as positions relative to target
+           size in tracking mode?
+       * switch to something more suitable than aruco
+         * works at longer range and is faster... maybe implementable on GPU?
+       * switch to searching a smaller region when actively tracking for fast frame
+         rate
+       * create performance tests for target tracker
+       * render target in rf_command somehow
+         * do I want to try and register it to the FPV camera
+
+     * numerical turret angle isn't as handy as seeing a diagram of the
+       robots current configuration relative to the turret
+     * get a shorter ffc cable for pi camera
+     * make magnet spacers get the magnets closer to the chips for
+       improved velocity estimates
+
+   * Need cover for main power switch so a BB doesn't hit it
+   * build "plugs" to cover and protect the cable entry points on
+     exterior motors... clamp around cables and somehow snap onto upper
+     motor joint and onto bare motor
+     * also for blank power switch
+     * and for cable exit points from chassis (maybe could double as
+       switch cover?
+   * measure walking battery life
+
+   * render mech orientation graphically in rf_command in turret mode
+   * make some control mechanism to squat or pitch/roll to aim at low
+     things
+   * test walking, shooting, and accuracy with targets at range
+   * build a single USB plug control fixture for the 3 USB/RF things
+     * nrfusb
+     * xbox controller
+     * fpv receiver
+
+   * Running faster than 400Hz gives odd timing results
+
+ * Had to power cycle master nrfusb to get reception working?
+
+ * flip
+  * Get it to go again with reduced joint velocities
+  * Need to update mass and moments for legs and chassis in sim
+  * not sure gains are increased after landing so that it can stand
+    again
+
+ * Further jump work
+
+   * jump parameters are pretty twitchy... the "landing" phase doesn't
+     follow any controlled velocity trajectory very well.  Sometimes
+     landing is entered too early because retracting didn't follow
+     well.
+
+   * legs need to move *past* idle when in retract phase to have maximum travel
+     * need to somehow control gait cycle time to manage speed and not
+       run out of travel
+
+   * Need a retracting condition to switch to landing (skipping
+     falling) if the legs start moving up or we start applying
+     significant force... that implies our legs have caught on the
+     ground.
+
+   * need to limit overall power so as to not exceed the batteries'
+     limit
+
+
+ * RF Control
+   * With chip antenna nrf, I unexpectedly see more than 50 per second
+     received on the robot side?
+   * The raspberry pi aux hat got into a state where either it, or the
+     master was only sending slot 0 and 1 with the app going, and when
+     the app was stopped it alternated between 0/1 and 8.
+   * receive data seems worse when the app is running... could be EMI,
+     but could also be a problem in aux fw
+   * have never seen a single packet reported dropped on the robot,
+     maybe the aux pi is always reporting slots even when they don't
+     make it?  Maybe it is just really good at receiving?
+   * pi aux should have a deadman on transmitting slots?  or some other
+     way for rf_command to know when the control app is dead?
+
+ * simulator
+   * get mass to be correct for each leg and the main body
+   * measure moment of all the moveable parts
+   * start in an appropriate position rather than falling
+
+ * Add sheathing to remaining cables
+
+ * legacy gait
+   * need a "sit down" mode again
+   * stop lowering when contact occurs, possibly go further than the
+     lift height
+
+ * make "quad" sticker to go under the mjbots one
+
+ * Just use "id" for all joint and leg ids
+
+ * Lifecycle
+   * Provide means to change control board LED flash pattern over CAN
+   * Start out in one flash pattern until host application starts
+   * Set one flash pattern when rezeroing is needed, and solid green
+     when good to go
+
+
+
+History
+~~~~~~~
+
+DONE 2020-05-06
+ * Made movement relative to turret when present
+ * built slide switch for FPV power
+
+DONE 2020-05-05
+ * created a mechanism to have a slightly different configuration for
+   the mech warfare case
+
+DONE 2020-05-04
+ * turret
+   * need more functional joystick rates, either expo or piecewise linear
+   * limited angular acceleration
+
+DONE 2020-05-03
+ * voltage feedback over RF needs to be finer grained than volt, at
+   least 0.25 volt
+ * start turret SW at boot
+ * soft-shutdown
+
+DONE 2020-05-02
+ * turret
+   * Got everything replaced so that real battery fits
+   * mid-plate needs cutout for battery terminal
+   * battery cover exit should line up with new battery's terminal
+   * battery cover could use thicker detents on the tabs
+   * top shell interferes with antenna
+   * top shell interferes with pi power cable, will even more with
+     3mm more space
+   * top/bottom shell needs space around power dist board power
+     plugs for wires to escape
+   * top shell needs more material behind lens inserts
+   * bottom shell needs more material around lens inserts
+   * top shell top bolt pattern doesn't match right frame or back of
+     loader cap
+
+DONE 2020-05-01
+ * Verified camera works with raspivid
+
+DONE 2020-04-30
+ * moved turret pi 3mm closer to bracket
+ * got rf_command receiving telemetry from both things simultaneously
+ * got rf_command sending commands to turret
+ * limit pitch based on absolute limits
+
+DONE 2020-04-27
+ * got flip to work in sim!
+
+DONE 2020-04-26
+ * turret app
+  * wrote control loop
+  * set cpu affinity
+  * wrote app side RF link
+
+DONE 2020-04-25
+ * Finished basic assembly of turret
+ * Verified CAN works to both moteus boards and the power distribution
+   board
+ * turret application
+  * stub application
+  * reports IMU and servo values in some form to log
+  * configure zero position on servos
+  * Support sign changes on servos
+  * make IMU orientation configurable
+  * made a simple web app
+
+DONE 2020-04-16
+ * Ordered AEG board
+
+DONE 2020-04-15
+ * Progress on turret... rough layout of aeg_driver done.  CAD for
+   left side and yaw roughed in.  Loader and hop up printed and tested
+   to work.
+
+DONE 2020-04-07
+ * Improved jump heuristics some... now does a better job of hitting
+   the lower height, although for some reason I can't manage to
+   recursively calculate an accurate constant acceleration profile to
+   reach it.
+
+DONE 2020-04-03
+ * Got video rendering working in rf command
+
+DONE 2020-04-02
+ * Got gait transition working smoothly.  Re-enabled "rest while
+   stopped" in rf_command
+
+DONE 2020-04-01
+ * First command over RF
+
+DONE 2020-03-31
+ * POC work on client, got GL rendered on top of webcam data
+   * webcam frame rate decoupled from rendering framerate
+   * Read mjpeg
+   * aspect ratio
+
+DONE 2020-03-28
+ * Got basic nrf hooked up to pi3 hat and working with cmdline client
+
+DONE 2020-03-27
+ * Fixed many signs
+
+DONE 2020-03-26
+ * Got basic control hooked up in sim, it walks and jumps!  (kinda)
+
+DONE 2020-03-25
+ * Got basic simulator geometry working
+ * Switched everything over to clipp to make dynamic selection easier
+
+DONE 2020-03-24
+ * Got dart GUI compiling and running
+
+DONE 2020-03-21
+ * Rewired legs to not have "wrap-around", got sheath on two before
+   running out of heat shrink
+ * Brought up power dist r3
+ * Reflashed and calibrated all servos
+
+DONE 2020-03-18
+ * Work on jump gait
+   * Used correct acceleration for pushing phase
+   * Fixed a glitch where extra_Z wasn't set on the final step of the
+     landing phase
+
+DONE 2020-03-11
+ * Integrated new telemetry into robot and tplot
+
+DONE 2020-03-09
+ * Fixed longstanding issue with jump landing being cut short
+
+DONE 2020-03-05
+ * Got rezeroing interlock into place
+ * Flipped sign of front knees, now it walks in a more anthropomorphic
+   way.  Fixed enough stuff to make that work.
+
+DONE 2020-03-04
+ * Got full rate IMU data into log!
+
+DONE 2020-03-03
+ * Got jumping working again
+
+DONE 2020-03-02
+ * Got stub of walking control working
+ * Got walking largely working
+ * Got idle position decoupled from standup position
+ * Got mostly constant acceleration trajectories for lift and lower
+
+DONE 2020-03-01
+ * Implemented stub of walking control
+
+DONE 2020-02-27
+ * rpi3 mounted on chassis
+ * Updated all legs to new geometry
+ * zerod all servos
+ * debugged a too high SPI speed
+ * created A1 config
+ * updated start-robot
+ * first movement!
+ * jumped!
+
+DONE 2020-02-26
+ * More work on pi3 hat... now have multi-device queries working for 2
+   devices per bus, going across 8 devices in all.  When doing 3 at
+   once per bus something seems to drop one of the commands.
+ * Got everything working.  Cycle time could still be optimized more,
+   but decent enough for now.
+
+DONE 2020-02-25
+ * Got pi3 hat communicating with servos
+ * Started writing "my first" AsioClient for the pi3 hat based on
+   spidev.  Will probably have to do a bit-bang one eventually, but
+   this will get me started
+
+DONE 2020-02-23
+ * Updated to mjlib w/ move-only callbacks
+ * Updated moteus_tool to work with new extensibility framework
+
+DONE 2019-10-29
+ * Numbered legs
+
+DONE 2019-10-28
+ * Moved everything to chassis v2
+
+DONE 2019-10-24
+ * Worked to integrate L frame motion into the jump mode
+ * Added a non-latching zero velocity mode to servo
+ * First kinda-moving jump mode, each resulting in a fault of some
+   sort, most of which resulting in losing all relevant logs so it is
+   hard to debug.  The battery didn't fall out, so I think they all
+   had an overall power system fault that rebooted the pi.
+
+DONE 2019-10-23
+ * Integrated websocket/joystick UI into quadruped application, got it
+   working for resting and zero
+
+DONE 2019-10-22
+ * Created websocket joystick PoC that sends joystick data to the
+   server and retrieves data from the server to the UI
+
+DONE 2019-10-21
+ * "rest" mode needs to smoothly slew to idle height
+ * make single jump revert to rest mode, so you can just send the
+   jump command again
+
+DONE 2019-10-19
+ * Implemented "rest" control mode
+
+DONE 2019-10-18
+ * Printed new chassis top plate with turret mounts
+ * Work on standup control mode
+
+DONE 2019-10-17
+ * Implemented most of a new standalone control app, got joint and leg
+   modes done
+
+DONE 2019-10-15
+ * Wrote tools to compare IK solutions and generate plots
+
+DONE 2019-10-13
+ * Got inverse force in revised IK
+
+DONE 2019-10-12
+ * Got inverse velocity in revised IK
+
+DONE 2019-10-11
+ * Installed new bottom plates
+ * Sorted out Amass inventory
+ * Keep working on revised IK
+
+DONE 2019-10-10
+ * Test fit of chassis v2, tried sanding a corner... wow, one corner
+   took almost 2 hours and isn't even perfect
+
+DONE 2019-10-08
+ * Made up a draft of the nrfusb... will wait on something else with
+   the stm32g4 on it working before I send off yet another untested
+   layout.
+ * First chassis v2 front plate printed
+
+DONE 2019-10-07
+ * Ordered fdusbcan from macrofab
+
+DONE 2019-10-04
+ * Got improved fault handling working, we now command zero velocity
+   for all remaining servos on a fault
+
+DONE 2019-10-03
+ * Replaced busted leg #1
+
+DONE 2019-09-30
+ * rev power distribution / pre-charge
+   * put 5 XT30 power plugs and pre-charge on one board
+   * include power switch
+   * CAN bus too for soft power control?
+
+DONE 2019-09-20
+ * Working on no-resting leg sit-stand sequence.  Have standing and
+   starting to walk working.  Sitting down is having frame
+   transformation issues when stepping to a place where sitting down
+   is possible.
+ * Figured out that I had the signs of all femurs and tibias
+   backwards.  This was causing the IK to have an inversion across the
+   x axis, as well as making the pitch motion of the body be
+   inaccurate, as well as other problems (like making it walk
+   backwards).
+ * Smoothed out body offsets
+
+DONE 2019-09-05
+ * Worked up latency analysis for current implementation.  Looking to
+   see what can be done to reduce rpi turnaround time, so trying newer
+   kernel and rt-preempt.  Also need to test that to see if the newer
+   kernel fixes the bug that locks up the serial port when it
+   overruns.
+
+DONE 2019-08-22
+ * JUMP!
+
+DONE 2019-08-20
+ * Set shoulder gains to 800/15 and swing_percent to 30, seems to walk
+   decently well, although there are still some underdamped yaw
+   oscillations.
+ * Turning still doesn't work at all.  I think that I may have the
+   legs not all configured correctly
+ * Reconfigured legs, got turning working, although pitch still
+   doesn't seem to work properly.  Really need to get legtool level
+   diagnostics working again.
+
+DONE 2019-08-16
+ * First walking with new chassis!
+ * Got manual mode working through cmdline option "--opt.manual_mode 1"
+
+DONE 2019-08-15
+ * Flashed another rpi3
+ * Flashed another rpi3 hat
+ * Installed mech sw on rpi3
+ * Mounted rpi3
+ * Zeroed and set range for all 12 servos
+ * First draft of mech config
+ * Made the legs cycle for the first time.  It doesn't look like the
+   legs are lifting the correct amount though, not sure what is up
+   with that.
+ * Leg lifting problems were due to a scale factor on the velocity
+   sent to the joints.
+
+DONE 2019-06-14
+ * Finished refurbing SN4 and SN3.  SN12 is proving more problematic,
+   trying to print a new back housing to see if bearing misalignment
+   is causing its problems.
+
+DONE 2019-06-11
+ * Lengthened 3x motor leads to use as lower leg joints
+
+DONE 2019-06-10
+ * Installed remaining 6x reinforcing rings
+
+DONE 2019-06-09
+ * Processed final reinforcing rings
+
+DONE 2019-06-06
+ * Finished printing everything but 1 reinforcing ring set!
+ * Removed all legs from old chassis
+ * Installed first full rotation leg on chassis
+ * Installed 3x legs worth of heat set inserts
+ * Re-printed tensioners, as the first batch all failed during bearing
+   installation
+ * Pressed bearings into 3x upper legs
+ * Disassembled all 3 remaining old legs
+
+DONE 2019-06-01
+ * Processed 3x reinforcing rings from the printer
+ * Started a shoulder and upper motor joint print
+ * Tried to mill the sun gear holder in 2-op mode.  First time, failed
+   because I plain screwed up the program and plunged directly into
+   uncut material.
+   * Second time got all the way through the 3mm Datron portion, then
+     drove the long reach mill way to hard and stalled it, then it
+     exploded when I tried to spin it up a second time with way
+     reduced parameters.
+
+DONE 2019-05-31
+ * Test assembled full rotation leg... largely looks to work
+   * Upper leg a tad too small, the belt rubs against the upper insert support
+   * Lower leg bolt holes didn't go all the way through
+ * Ordered more belts and pulleys
+ * Printed 2x more reinforcing rings
+
+DONE 2019-05-30
+ * Got 5mm gt3 upper and lower pulley off printer... upper was busted
+   and had to be re-printed
+ * Updated upper and lower leg for 28/28 gearing, made both a little
+   bit longer to handle the longer belt I had assuming a bigger lower
+   gear size
+ * Installed reinforcing ring on SN13
+ * Assembled all the motors for the full rotation leg, just missing
+   actual leg!
+ * Stripped down umbilical
+ * New upper pulley seems to work fine
+ * Debugged turret EMI problem... wasn't able to exactly reproduce on
+   the lab bench, but scoping the power supply showed massive voltage
+   ripple.  Added a lot of capacitors and things looked a whole lot
+   better.
+
+
+DONE 2019-05-23
+ * Got upper leg print, mounted on motor with reinforcing ring along
+   with pulley, old lower leg, and new knee stud.
+ * Printed shoulder with increased spacing
+ * Installed longer power leads and a jump RS485 cable onto SN6 for
+   full rotation upper leg test
+ * Drilled out second reinforcing ring
+
+DONE 2019-05-21
+ * Unpacked
+ * Printed test reinforcing ring
+ * Printed test full rotation shoulder
+
+DONE 2019-05-15
+ * Installed second target panel adapter
+ * Tested ethernet from laptop to rpi
+ * Tested 5.8ghz tx, while sending controller video over it!
+ * Looks like my wifi frequency doesn't overlap with any of the FPV
+   frequencies, and changing it is just tweaking
+   /etc/hostapd/hostapd.conf.
+ * Designed and printed a "desk bracket" to clamp a freestanding motor
+   to a desk/table
+ * Connectorized and flashed spare rpi3 hat fresh from macrofab
+ * Built 3.5A 20V 3.5mm bullet supply from an old thinkpad wall wart
+ * Build spare gearbox SN13
+ * Cutout a bunch of fiducials
+
+
+DONE 2019-05-14
+ * Printed lower pulleys at 0.15mm, installed
+ * Printed extra belt tensioners, have two in each leg
+ * Re-zeroed the gimbal yaw
+ * Re-glued the 3 loosest resting feet
+ * Fixed jumping shoulder joints... they were being started outside of
+   their absolute position limits.  Noted it in the moteus TODO
+ * Installed turret shroud
+ * Took "qualification" video, including firing some BBs
+ * Installed first 8 gearbox protectors
+ * Printed and double sided taped target panel adapter
+ * Build new harnesses between femurs and tibias and tied them up
+ * Built mech software and tested control from laptop
+ * Verified I could build moteus firmware and run openocd on laptop
+ * Did some minimal experiments with fiducials... they seem probably
+   about as good as they were before in the lighting conditions I was
+   able to get tonight.
+ * Printed out a bunch of fiducials
+
+DONE 2019-05-13
+ * Got first 8 gearboxes assembled
+   * I feel like a gunsmith before interchangeable parts!
+ * Smoothness binning
+   * SN7 & 8 are the worst, but not terrible even
+   * 5, 6, 9, 10, 11, 12 are all pretty good
+ * iFlight stators are in SN7 and SN10
+ * Assembled and installed all 4 motors.  Walked on them!
+
+DONE 2019-05-12
+ * Started assembling gearboxes
+   * Post-machined the back plates to give more room
+   * R3 SN9 was formerly an id #5 and needed its encoder integral limit
+     relaxed to cal
+
+DONE 2019-05-11
+ * much progress on gearboxes
+ * working print of leg
+ * working print of shoulder
+
+DONE 2019-05-10
+ * fine machining on all rotors
+ * Finished reprint of 100tooth gear mandrel
+ * Kinda turned down remaining two gears... they seem a little out of
+   true, but maybe they will work?  Diameter varies by +- 0.1mm around
+   the circumferences, so I aimed for 54.80-55.00.
+
+
+DONE 2019-05-09
+ * Ordered more HW for gearbox builds
+ * Turned down 6 more gears, fixture broke doing last two :(
+ * Designed gearbox leg and shoulder bracket
+
+DONE 2019-05-08
+ * Separated the rest of the motors, including disassembly all but one
+   of the direct drive legs
+ * Tried to turn down inner gears... mandrel is now too loose to hold
+   gears without some kind of clamp.  Designed a clamp and will print
+   it tonight.
+ * Rough machined 10 rotors
+ * Rough machined 10 stators
+ * Built 100tooth mandrel cap, installed inserts into mandrel and test
+   fit... seems like it will work
+ * Final removal of all stators
+
+DONE 2019-05-07
+ * Got multiplex_tool in the deployed image
+ * Updated servos to allow re-zeroing after boot, wrote a script to
+   re-zero all servos
+ * Pretty much gave up on the direct drive motors. :( #5 just is never
+   good enough, and it is close enough to the edge power wise, that
+   even slight problems result in it overheating or over-currenting.
+ * Filed down 10 more sun gear holders
+ * Separated a bunch of motors
+
+DONE 2019-05-06
+ * Investigated high power draw from servo #5.  AFAIK the problem is
+   just some slight assymmetry in either the leg or the chassis that
+   makes it need a little more torque to hold the same position.  When
+   the robot tips a bit to the left, then it needs even more torque,
+   which results in a bad feedback loop that results in maybe 2x the
+   current consumption in that servo.  I attribute this to poor
+   position control bandwidth also.
+ * Tried decreasing kp by 4.5x... it was much more damped, but also
+   unable to stand unassisted. :(
+ * Finished up 3 more controller boards.  Servo 5 was SN 24, going to
+   swap it out with newly readied 33 to see if it works any better.
+ * Pulled SN 29 off of servo 10, since it has a busted temp sensor.
+   Replaced with SN 39
+ * Seems to walk significantly better with new #5 servo, but that
+   servo is still getting hotter than the other lower leg ones by a
+   fair amount. :( Guess I'll check the heatsink compound on the other
+   side too.
+ * Tried fiddling with leg lift height.  20cm is the minimum that
+   doesn't catch on the ground when moving.  30cm clears reliably, but
+   is really stompy.  Legs are also slipping a fair amount even on
+   foam, maybe when the others stomp down?  Need to look at high speed
+   video.
+ * Re-applied thermal paste on back of #5's heat sink
+ * Got high fps video, several problems
+   * It still sags somewhat when legs are in flight
+   * When legs land, they hit hard enough to bounce the other legs out
+     of contact with the ground, causing slippage.
+ * More work to improve smoothness of walking
+   * Gently ramp in feed-forward term after landing
+   * Drop p-term when in flight and gradually ramp it back up when on
+     the ground
+ * Replacement #5 board still has calibration drift! :( It must be
+   either related to how hot it is getting, how much current is going
+   through it, or the bracket.
+ * Made legs switch into world frame *before* landing, so they have
+   zero translational velocity when they hit.
+
+DONE 2019-05-05
+ * Tested feedforward current... seems to have the desired effect of
+   reducing sag when stepping in place.  Doesn't seem to help walking
+   a whole lot yet.
+ * Figured out at least one IK problem.  The tibia joint no longer had
+   the relationship I thought it did now that I have a geared belt in
+   place.  Applied correction in code, and re-zeroed all the servos.
+   * The preposition_z_offset seems to work as expected now, yay!
+ * Still doesn't walk very well, although now it looks like something
+   is up with servo #5.  It keeps getting way hotter than everything
+   else for the same gait cycles, and also keeps having its cal drift.
+
+DONE 2019-05-04
+ * Updated to torque max command
+ * Set gimbal power to 0.95, lowered pitch limit to -20 deg
+ * Got left leg shroud #2 off printer
+ * Installed remaining retaining clips
+
+DONE 2019-05-03
+ * Got pre-charge board installed, first untethered operation!
+ * Finished printing turret shroud
+ * Printed turret shroud adapters, glued to turret
+ * Tried test fitting retaining rings onto leg shafts... was using the
+   wrong tool and broke it after getting two on.  Hopefully ordered
+   the right and higher quality tool.
+ * Assembled first leg shroud, cut out front leg holes
+ * Printed leg shroud adapters, glued first set to chassis, mounted
+   leg shroud on chassis
+
+
+DONE 2019-05-02
+ * Updated bootloader to take new multiplex command
+ * Re-flashed bootloader on all servos
+ * Tried to make moteus_tool more robust when flashing... somehow
+   ended up bricking board SN 21.  It reported as read protected and
+   even the windows st-link util couldn't un-read protect it.  Swapped
+   out for SN 35.
+ * Designed leg shroud mounting adapters
+ * Verified tview can talk to everything, although only one device at
+   a time for some reason... probably latency and timeouts are
+   screwing things up
+ * Installed squash balls on resting feet
+ * Reproduced skipping the sitting phase
+ * Iterated on sitting and standing.  Got it pretty reliable.
+ * Test printed a fiducial on card-stock with new printer.  Seems like
+   it will work out to at least 10ft w/ official 3in max size.
+ * Got monitoring of servos working, and shutdown in the case of
+   fault... although it polls infrequently enough that it isn't likely
+   to help
+ * When stopping, got the gait to keep stepping until the legs are in
+   a good position.  Also applied acceleration in both directions,
+   since slowing down was causing problems too.
+
+DONE 2019-05-01
+ * Kept trying to print chassis leg shroud... first time failed, tried
+   again with thicker walls so that maybe it will deflect less while
+   printing.
+ * Modeled up the turret in f360, then made a shroud. Initially tried
+   to use freecad, since I had it there already, but freecad really
+   doesn't have a good way to created mirrored bodies which are
+   slightly different from one another.
+ * Installed polycarbonate lens for camera
+ * Updated tview to support network connections, then fought for an
+   absurdly long time trying to make it work.  It turns out the rpi's
+   uart fifo is only 16 bytes big!  Also, the kernel driver has a bug
+   that locks out the IRQ if data comes in too fast.  tview reliably
+   triggers this by asking for large binary schemas.  I compiled and
+   installed a preempt_rt build, which significantly decreased overall
+   performance, but didn't actually help with the serial lockup issue.
+   I tried setting the CPU affinity, but that didn't work at all.  I'm
+   kind of at a loss.  I guess I could update the multiplex protocol
+   to allow the master to control the maximum size of a tunnel reply,
+   which would at least allow me to work around the issue.
+
+
+DONE 2019-04-30
+ * Implemented support for moteus turret, connected it up and operated
+   it from the joystick!
+ * Installed resting feet
+ * Tested integrated robot, including resting feet
+
+DONE 2019-04-29
+ * Ordered FPV transmitter and receiver
+ * Implemented standup and sitdown phase
+
+DONE 2019-04-28
+ * Finished bringing up gimbal board
+
+DONE 2019-04-27
+ * Recalibrated servo 5.  Everything else is holding just fine, I'm
+   not sure what is different about that one yet.
+
+DONE 2019-04-26
+ * Got all moteus changes committed and pushed
+ * Got all legs configured properly, first reasonable walking!
+
+DONE 2019-04-20
+ * Started porting gimbal code to rules_mbed / mjlib
+   * Got a basic rs485 multiplex build functioning on the board, and
+     every sub-module compiling
+
+DONE 2019-02-21
+ * More work on updated pi3 hat
+   * completed routing
+   * completed BOM
+   * fine silk placement
+   * BOM optimized down to 20 line items
+
+DONE 2019-02-20
+ * Worked on pi3 hat r2 w/ rs485 and higher voltage input
+
+DONE 2018-09-11
+ * design shroud
+  * ensure weapon can rotate freely in both mounting positions
+  * add joining face at half boundary so it mates at more than a wall
+    thickness point
+  * split into two halves
+  * ensure rear and front will clear panel mounting supports
+  * cutout bottom area for gimbal
+  * cutout to turn on/off weapon activator switch
+  * ensure there is appropriate space for power wire to exit
+  * add structural connection to gimbal on sides
+  * consider upping thickness to 1.5 or 2mm
+  * cutout top for loading
+  * cutout front slot for barrel, laser, and camera
+  * add clips to hold two halves together
+
+
+ * Get 3d printed
+   * new base plate
+   * new vertical plates
+   * shroud
+
+DONE 2018-08-31
+ * Finished up design of new base plate and vertical plates
+
+DONE 2018-08-28
+ * Made video of target tracking working
+
+DONE 2018-08-26
+ * Got aruco targets detected and rendered in frontend GUI
+
+DONE 2018-08-22
+ * Switched to unicast, couldn't figure out a way to set mcast rate on
+   bcm43455c0
+ * Updated configs and startup script
+ * Discovered that 720p is all the rpi3 can encode with current
+   optimizations
+
+DONE 2018-08-20
+ * Mounted turret in correct orientation
+
+DONE 2018-08-19
+ * first walking with rpi3!
+ * discovered I mounted the turret backwards, need to reassemble
+   correctly
+
+DONE 2018-08-18
+ * Built cable to connect rpi3 to gimbal
+ * Verified rpi3 could communicate with gimbal over herkulex protocol
+
+DONE 2018-08-13
+ * get tview and tplot operating again
+ * boot up turret board again, recalibrate the gyro and both motors
+
+DONE 2018-08-12
+ * Packaged python and boost::python
+ * Got tview working
+
+DONE 2018-08-10
+ * Removed level translators from mammal odroid board
+ * Received pi3 shields r1
+ * Updated everything to bionic
+ * Modded pi3 hat to have correct voltage, tested and seems to power
+   the pi3 just fine
+
+DONE 2018-07-30
+ * Wrote setup script
+
+DONE 2018-07-23
+ * Got gimbal building on xenial
+ * Upgraded everything to bazel 0.15.1
+
+DONE 2018-07-17
+ * Modified brackets to move rpi3 and weapon further forward.  Seems
+   to balance relatively well in that position, although you can't put
+   a nut on the top weapon bolt
+
+DONE 2018-07-16
+ * Verified serial functionality
+ * Basic fit check of rpi3 mounting hardware
+ * Got rpi3 hat sent off to mfg
+
+DONE 2017-06-26
+ * joule camera working
+ * all software running on ref-os-iot
+
+DONE 2017-06-12
+ * Got root ssh login on joule
+ * All deps running on joule
+
+DONE 2016-12-02
+ * Verified that UART0 and UART1 work in joule ubuntu, up to 4M baud
+   each
+
+DONE 2016-11-10
+ * Sent in order for beefier mammal shoulder bracket to 3dhubs after
+   emachineshop couldn't do it out of al plate.
+
+DONE 2016-11-06
+ * Sent in order for mammal shoulder bracket to emachineshop
+
+DONE 2016-11-05
+ * Finalized emachineshop drawing for mammal shoulder bracker
+
+DONE 2016-11-04
+ * Mostly recreated mammal bracket in e-machineshop after windows ate
+   everything
+
+DONE 2016-03-12
+ * Connected up scoring LED board on mammal robot
+ * Populated through hole things on spare v3 gimbal board
+ * Moved offset config from mw_command into MechWarfare
+
+DONE 2016-03-11
+ * ordered competition BBs
+
+DONE 2016-03-10
+ * fixed video recording
+ * need a way to stop sending commands to robot and to view if it
+   thinks the servos have been idled or not
+ * OSD -- targeting grid, just fixed in the center to make it easier
+   to see where the laser would be
+
+DONE 2016-03-05
+ * add button to prevent rotation from happening temporarily
+ * implement a minimal simulated turret and enable it by default
+
+DONE 2016-03-04
+ * the additional mode buttons appear to apply in parallel with drive mode
+
+DONE 2016-03-03
+ * control: make sure agitator control activates occasionally when
+   firing somehow
+
+DONE 2016-03-02
+ * re-routed USB camera harness on first gimbal to reduce likelihood
+   of camera falling off USB bus
+
+DONE 2016-03-01
+ * reconnector the lizard scoring harnesses to JST
+
+DONE 2016-02-29:
+ * start_robot: option to run without recompiliing
+ * fix video recording
+ * test lizard robot walking w/ both xbox and logitech joystick
+ * test and tune constants for limiting translation when rotating
+
+DONE 2016-02-28
+ * control: bring in joystick control code to video_controller_app process.
+ * Assemble second weapon
+   * add JST connector to second webcam
+   * build power/data cable to main chassis
+   * build USB cable to main chassis
+
+DONE 2016-02-27
+ * Assembled second weapon
+ * Started filling up toolbox with parts
+   * Ordered more baggies so that I can finish
+ * Built weapon to gimbal stabilizer cable
+ * Built IMU cable
+ * Hot glued laser into place
+ * Populated AS5048B board
+ * built pitch encoder cable
+
+DONE 2016-02-26
+ * Verified that OSD correctly shows voltage and turret
+   position... likely the fire time is correct too
+
+DONE 2016-02-25
+ * Status reporting from the robot
+
+DONE 2016-02-24
+ * finished assembling all 8 target panels
+
+DONE 2016-02-23
+ * Mostly assembled 4 .1" target panels
+ * Partially assembled 4 JST target panels
+
+DONE 2016-02-22
+ * Got lizard chassis operating using the MechWarfare
+ * assembled third transponder board and remaining 2 LED boards
+
+DONE 2016-02-14
+ * Create gimbal board protective 3D printed cover and ordered from
+   shapeways
+
+DONE 2016-02-13
+ * designed and ordered new turret gimbal
+ * install shapeways barrel lock
+
+DONE 2016-02-11
+ * video: ensure --camera.write_video on sender produces playable file
+ * video: decrease the latency of the network link / receiver (currently ~200mS)
+
+DONE 2016-02-10
+ * video: finish McastVideoLink
+  - packetize frames into packets, merge them back
+  - send on fixed schedule (but apply corrections if this is too slow)
+  - ensure we log all packets
+
+DONE 2016-02-10
+ * added eeprom support to herkulex_tool
+ * made MechWarfare verify minimum voltage configuration on start
+ * recorded full turret config, tuned yaw to have almost no overshoot
+
+DONE 2016-02-08
+ * if a servo goes power off, we need to report it in a big way, but
+   not automatically re-enable it
+ * make turret rate commands able to operate in a fine mode somehow,
+   either a gradiated rate scheme, or a toggle for fine mode
+ * ordered new versions of weapon plates, jaws, and lizard turret
+   mount from emachineshop
+
+DONE 2016-02-07
+ * Need to re-calibrate turret gyro any time torque is enabled
+
+DONE 2016-02-03
+ * prepared freecad and dxf files for new turret plate, new turret
+   jaws, and new lizard turret adaptor
+
+DONE 2016-02-02
+ * rev gimbal board and get 2x of the clean version made
+ * ordered some nylon spacers to use for "feet" under the bottom body
+   plate
+
+DONE 2016-01-31
+ * verify that absolute yaw and pitch control work in gimbal
+
+
+DONE 2016-01-30
+ * Update commands for single person operation
+   * right stick controls gimbal
+   * left stick translates
+   * onboard logic tries to keep machine moving in optimal direction
+     without obviously moving camera
+
+DONE 2016-01-29
+ * Switch turret rate commands to use the onboard rate motion
+ * Tune gaits for loaded mech (may need to increase range of joints?)
+
+DONE 2016-01-27
+ * Finish testing scoring transponder
+ * Mount scoring transponder
+ * Mount and wire scoring panels
+
+DONE 2016-01-26
+ * mounted savage solder camera and IMU to inside of weapon plate
+ * finished populating second scoring transponder, basic power on test
+
+DONE 2016-01-25
+ * ordered spare gimbal motors
+
+DONE 2016-01-21
+ * Build power/data harness to go from top plate to turret
+ * Build USB harness to go from top plate to turret
+ * Test mount bottom plate and battery
+ * Mostly populated a new transponder board
+
+DONE 2016-01-20
+ * gimbal harness rebuilds
+   * motor wires
+   * weapon wires
+   * Build final IMU harness and mount
+ * tested BMI160 breakout board on discovery platform
+
+DONE 2016-01-19
+ * Ordered second set of 3d printed parts for weapon
+ * Drilled holes to mount turret yaw motor on plate and mounted
+ * Ordered necessary parts to populate second scoring transponder and
+   LED board
+
+DONE 2016-01-18
+ * tested translation acceleration limiting... seems to keep it from
+   tipping over minus turret at least
+
+DONE 2016-01-17
+ * Designed and got quote for panel mount L brackets
+
+DONE 2016-01-14
+ * Calling the simulator working enough for now
+
+DONE 2015-03-11:
+ * Log stdout/stderr of external processes of vserver
+
+
+DONE 2015-03-07:
+ * Tune turret servoes more for better performance
+ * Log turret position even when not in 'inpos firing' mode
+ * Better logging while waiting for firing servoes to settle
+ * On UI, show desired/actual turret position difference
+ * Add an option to manually tweak camera calibration
+
+DONE 2015-03-06:
+ * Accelerometer data logger which runs on odroid
+ * Log analysis tool which plots accelerometer data, events from ~/.mjmech log
+ * Legtool servo settings support
+ * Initial turret servo tuning
+ * Poll (and send) turret servo actual positions
+ * Make 'auto-agitator' mode which runs it only for some interval
+   after the shots.
+ * UI: Show bullet count (approx.)
+ * Better logging: log client-side messages
+
+DONE 2015-03-04:
+ * Tried to change .svg file generation to make entries more readable. Have
+   a patch which blurs the background -- great effect, but too high of a CPU
+   usage
+
+DONE 2015-03-03:
+ * Add clear plastic cover above odroid
+ * UI: Hide debug-priority messages from OSD (leave on stdout), demote some
+   messages to stdout
+ * Added skeleton for i2c poller (for accelerometer support)
+
+DONE 2015-03-02:
+ * UI: fix reticle #1 to use proper display mapping, calibration.
+ * Restart servoes when server restarts (instead of just powering down)
+ * Log server statuses, including errors
+
+DONE 2015-03-01:
+ * UI: One-click shooting -- should shoot once both servoes report INPOSITION
+  - shoots on right button click once it is enabled
+ * UI: Inactivity timer -- shows contigious time spent not moving
+
+
+DONE 2015-02-24:
+ * UI: Post-click motion
+   - When you click, if you hold the mouse and shift it, it slightly tweaks
+     gun positions
+   - Esp. great with one-click shooting
+ * UI: Make fire motor time adjustable (or at least longer)
+
+DONE 2015-02-23
+ * UI: report back status -- servo temperature
+ * power-on turret with 'c' command
+ * UI: move turret with arrow keys
+
+DONE 2014-12-20
+ * installed safety switch light and re-assembled mech
+
+DONE 2014-10-09
+ * sent off the mold v2 to be built at shapeways for upright casting
+
+DONE 2014-10-07
+ * Evaluated VytaFlex 20 casting
+ *  * in-line force: 7 counts/lb
+ *  * highest-sensitivity angle: 12 counts/lb
+
+DONE 2014-10-05
+ * started a casting with VytaFlex 20
+
+DONE 2014-10-04
+ * got legtool working on odroid
+ * did a first pass at tuning gaits on the real robot
+ * made servo communications more robust over tcp
+
+DONE 2014-10-02
+ * understood why my experiments at compensating for a gyro going over-rate
+   were failing... the quaternion representation just cannot accurately
+   represent large covariances, as after quaternion normalization, adjustments
+   beyond 1.0 just peter out.  The only way to get more rapid convergence is
+   to temporarily increase the attitude process noise, after which arbitrarily
+   fast convergence can be had!
+
+DONE 2014-09-29
+ * got basic IMU plotting working, along with python unittest test cases for
+   stationary performance of different sensors
+
+DONE 2014-09-27
+ * got legtool working with TCP servos
+
+DONE 0214-09-21
+ * first untethered walking!
+ * made joystick input work with logitech joystick too
+
+DONE 2014-09-20
+ * finished all but molding on the next two boards
+
+DONE 2014-09-18
+ * populated two more boards
+ * received vytaflex 20 for testing
+
+DONE 2014-09-15
+ * demolded vacuum formed foot... sensitivity up by 3x, but still not terribly
+   good
+ * sensor 2014-09-15 (vacuum molded, 6mm rubber)
+ *  * in line force: 5 counts/lb
+ *  * highest sensitivity angle: 15 counts/lb
+ * sensor 2014-09-11 (non-vacuum molded, 7mm rubber)
+ *  * in line force: 2 counts/lb
+ *  * highest sensitivity angle: 5 counts/lb
+ * ordered some vytaflex 20 and enough parts from digikey to populate the
+   other 4 boards I have for testing
+
+DONE 2014-09-14
+ * mounted post on second board, prepared for vacuum casting
+
+DONE 2014-09-13
+ * populated second board
+
+DONE 2014-09-11
+ * demolded foot transducer and tested... good news: it measures pressure!
+   bad news: not terribly well
+
+DONE 2014-09-10
+ * made rubber casting of first circuit board!
+
+DONE 2014-09-09
+ * photographed foot board with post and wires
+ * epoxied post into foot board
+
+DONE 2014-09-08
+ * placed post on board with new thinner ecowire... 6 wires just barely fits
+   through a #2 hole, but it did fit
+ * verified that I can program the AVR and snugged everything down
+
+DONE 2014-09-07
+ * Made legtool work with newest trollius
+ * Started work to let gait driver support multiple gait types in one execution
+
+DONE 2014-09-06
+ * updated gbulb to work with newer trollius
+ * got attitude filter mostly working, and c++ port which is at least 20x
+   faster than the python version
+ * ordered thinner gloves
+
+DONE 2014-09-04
+ * Tried threading posts with new collet to anchor them, works for those with
+   #2 hole size, #4 hole size doesn't leave enough material to be structural
+ * Ordered the slightly more expensive wire with a tiny bit smaller diameter
+   that is at least somewhat likely to be able to fit 6 wires in a #2 size
+   hole
+ * Continued working on getting a full attitude filter working, there is some
+   problem on the high rotation rate cases, that doesn't seem to crop up with
+   other acceleration is happening too
+
+DONE 2014-09-02
+ * C++ version speed compares well, 1d is much faster than real time on my
+   desktop
+
+DONE 2014-09-01
+ * analyze what the process and measurement noises should be for gyros and
+   accelerometers with noise model
+
+
+DONE 2014-08-30
+ * practiced threading posts, not very easy with just a vice
+ * ordered a collet and more posts to get more practice
+ * quoted a custom machined part at emachineshop, basically a $100 setup fee,
+   after which parts are $3-5 each.  wouldn't make sense until the design was
+   proven
+
+DONE 2014-08-29
+ * got barometer board working with wires in place instead of pins, had messed
+   up a bunch of stuff when removing the pins
+
+DONE 2014-08-28
+ * released casting with screw, seems to have worked
+
+DONE 2014-08-27
+ * made test mold with screw embedded in foot
+
+DONE 2014-08-24
+ * finished updating firmware for attiny85
+ * verified barometer functioning on board
+ * ordered post with wider hole
+
+DONE 2014-08-22
+ * verified programmer connectivity with attiny85 on transducer board
+
+DONE 2014-08-04
+ * debug firmware to test foot transducer (w/o multiplexed serial bus) complete
+ * ordered ecowire sample for foot transducer, and 6 pin connector/crimp pins
+ * ordered 26 awg hookup wire for general robot use
+
+DONE 2014-07-25
+ * specified wire for foot transducer leads, had to find something thin enough
+   to fit through the center of the post
+
+DONE 2014-07-23
+ * ordered foot mold from shapeways
+
+DONE 2014-07-21
+ * ordered mechanical parts for foot transducer
+ *  * die + handle
+ *  * spacer
+ *  * nuts
+ * ordered urethane rubber, sealant, and release agent
+ *  * smooth on vytaflex 60
+ * ordered misc supplies
+ *  * cutting oil
+ *  * steel epoxy
+
+DONE 2014-07-20
+ * selected barometer - mpl115a2
+ * designed pressure board
+ * sent off to oshpark
+ * made digikey order
+ *  * barometer
+ *  * attiny85
+ *  * passives
+
+DONE 2014-07-19
+ * connect up gait control through vclient and vserver
+ * write non-pygame joystick routines, so that it doesn't spew to stdout all
+   the time
+
+DONE 2014-07-13
+ * posted legtool video and announced
+ * received SSOP adapters from SFE
+
+DONE 2014-07-06
+ * Split out legtool into separate repo, included in mech via "git subtree"
+
+DONE 2014-07-02
+ * gazebo servo names are no longer hard coded
+ * pulled turret specific things out of gait_driver.py
+
+DONE 2014-07-01
+ * refactored all of mtool, now "legtool" into somewhat coherent python modules
+ * checked in code to make vserver use the actual mech interface
+
+DONE 2014-06-27
+ * updated ripple_gait to allow command changes at any time
+
+DONE 2014-06-26
+ * got very basic standalone driving application working
+
+DONE 2014-06-11
+ * fixed: when stopping playback, the idle pose is not reliably commanded.
+   possibly due to the same cause, dragging the mouse around the commander
+   with body coordinates does not result in smooth motion
+ * after adding better logging to temperature loop, identified that it was an
+   assertion failure somewhere, but it hasn't happened again to show which one
+
+DONE 2014-06-10
+ * pushed to github and gitlab pygazebo and mtool versions which at least
+   mostly work running on trollius, there are still a few outstanding bugs in
+   mtool though
+
+DONE 2014-06-06
+ * continued work on moving pygazebo and herkulex.py to asyncio.  Have
+   pygazebo all converted, but need to fill in some test coverage and verify
+   it works actually commanding things
+
+DONE 2014-06-02
+ * got amble gaits (and other random leg groupings) working... they work much
+   better without trying to be statically stable, which isn't possible on a
+   quad anyways
+
+DONE 2014-06-01
+ * need to be able to set max and min on a per-servo basis, without having to
+   worry about accidentally putting it into an infeasible configuration
+ * changing leg number alone in IK tab didn't result in tester pointing at new
+   leg
+ * display servo temperature and voltage in status bar
+ * implement changing leg order
+
+DONE 2014-05-31
+ * constructed prototype turret plate
+ * re-assembled chassis with spacers on top
+
+DONE 2014-05-28
+ * Calibrated the legs so that they all touch the ground
+ * render legs which aren't feasible in red in the gait tab
+ * made static stable constants be proportional to cycle time
+
+DONE 2014-05-26
+ * implemented first pass at statically stable gait
+
+DONE 2014-05-25
+ * Ordered hardware to try a new mounting scheme for the turret, plus hook up
+   wire and connectors to wire up the motor driver board
+ * fixed sluggish playback when updating gait command widget
+
+DONE 2014-05-24
+ * Re-assembled with spacers on bottom, power dist board, motor driver, and
+   battery mounting plate installed
+ * Crimped on 0.1'' connectors to each of the servos cables
+ * Assigned addresses to all servos
+ * first walking!
+
+DONE 2014-05-23
+ * test assembly of legs with polycarb chassis
+
+DONE 2014-05-18
+ * gait tab can drive actual servos
+ * added aliases to get the pan and tilt turret to work in mtool
+ * made gait tab geometry view have square aspect ratio
+ * made mtool resizing work better
+ * it would be nice if the body commands could be set without waiting for a
+   gait transition even if nothing else could be
+
+DONE 2014-05-17
+ * Finished cutting prototype polycarb chassis plates
+
+DONE 2014-05-09
+ * continued work towards letting the gait tab drive actual servos... mostly
+   threading configurations through and cleaning things up
+ * fixed some residual broken-ness in the servo and ik tabs from re-factoring
+ * fixed link between leg config and the ik tester in the ik tab
+
+DONE 2014-05-07
+ * Added tests for symmetric gaits and fixed a couple of bugs to get them
+   closer to being symmetric
+ * stop playback when switching away from the gait tab
+ * generate the actions list on construction, since commands can now not
+   change it
+ * rendered the support polygon
+
+DONE 2014-05-05
+ * Fixed up the rendering of allowable gaits to be a little more responsive
+   and not be obviously incorrect.
+ * Added axes and grid to the geometry view, to verify that yes, the gaits
+   aren't coming out quite right
+
+DONE 2014-04-29
+ * implemented adjusting cycle time and downscaling the command to stay in the
+   achievable regime
+ * implemented the NotSupported exception for configurations that are not
+   possible
+ * rendered the current options in the UI
+ * render achievable commands in command widget
+
+DONE 2014-04-28
+ * redefine IK coordinate system so that it is the same for all legs as viewed
+   from each shoulder
+ * actually implement remainder of gait functionality... changing cycle time
+   and swing timing with speed
+
+DONE 2014-04-27
+ * Started work to verify that a given command is feasible
+
+DONE 2014-04-26
+ * Fixed some bugs and started writing a more comprehensive set of tests for
+   gait generation
+ * Implemented command widget for static gaits
+ * Rendered axes in command widget, and used new code to render axes in IK
+   tester in a slightly cleaner way
+
+DONE 2014-04-24
+ * Implemented steady state in mtool
+ * Fixed gait to combine translation and rotation in the way you would expect
+ * made slider cover two full phases
+ * removed end controls from playback
+ * implemented playback modes
+
+DONE 2014-04-23
+ * Hooked up spin based commands and let geometry viewer look in any reference
+   frame or projection
+
+DONE 2014-04-22
+ * Tried to make a basic implementation of ripple_gait, for zero commands
+   looking from the top it looks like it is working!
+
+DONE 2014-04-20
+ * Implemented rendering the body, shoulder, and leg positions with no
+   niceties (fixed scale, projection, and coordinate frame)
+ * Started work on the basic gait generation
+
+DONE 2014-04-14
+ * Implemented python "tf" library, to be used in gait tab.
+
+DONE 2014-04-13
+ * Continued very slow progress on gait tab of mtool, rendered gait graph.
+
+DONE 2014-04-09
+
+ * Started prototyping rough draft of python gait generator... really just
+   what the APIs should look like, no real functionality has been written yet
+
+DONE 2014-04-08
+
+ * Started prototyping interface in designer for the gait tool, I think I have
+   all or most of the interface elements I want in there, but I'm not yet sure
+   how feasible it will be to implement
+
+DONE 2014-04-06
+
+ * Read the last 5 years of posts on the Trossen Robotics forum, trying to
+   figure out what the state of the art in gait generation was.  Yikes, it
+   looks like NUKE is largely it.  A number of other people have done one-off
+   custom open loop controls, and stag is still the only one I could find
+   doing anything closed-loop-ish with a dynamic gait.  It doesn't look like
+   anyone actually knows how to measure attitude in a robust way using an
+   accel/gyro.
+
+ * mtool
+ *  * mtool needs to support multiple configuration files
+ *  * mtool needs to document what "idle" is
+
+DONE 2014-04-05
+ * Updated gazebo with current 3D models
+ * Ordered full complement of servos
+
+DONE 2014-04-03
+ * Added more missing items to servo order spreadsheet
+ * Figured out how to re-link a sketch to a new face in freecad
+ * Removed antenna from chassis model
+
+ * Started making gazebo visual models from freecad models... mostly just
+   re-learning blender
+
+DONE 2014-04-02
+ * Built servo order spreadsheet to keep track of all the parts we would need
+ *  * https://docs.google.com/spreadsheets/d/17kCEHZO_xlTlWSWM5mOakoSijZrfuTzqZxxZrZQiLXs/edit#gid=0
+ * added holes for servo cables to enter through bottom
+
+DONE 2014-04-01
+ * Added mounting tabs to all servos
+ * add mounting holes for each of the boards
+ * add supporting standoffs between the two chassis plates
+ * add plate to velcro battery to
+ * figure out where the center of mass is going to be, try to get it as close
+   to centered as possible (will allow dynamic gaits)
+ * make more decorative cutouts on the top plate
+
+DONE 2014-03-30
+ * Designed rough draft of chassis plates
+ * Created center of mass spreadsheet, flipped turret around to get it close to centered
+ *  * https://docs.google.com/spreadsheets/d/17kCEHZO_xlTlWSWM5mOakoSijZrfuTzqZxxZrZQiLXs/edit#gid=0
+
+DONE 2014-03-29
+ * Built power cable for odroid
+ * packaged up keyed male 0.1'' headers
+
+DONE 2014-03-28
+ * Moved turret to office
+
+DONE 2014-03-27
+ * Recorded some demo videos of the turret
+
+DONE 2014-03-26
+ * rotated reference frame
+ * decimated accelerometer input to get CPU usage down to 90% on my machine
+
+ * muzzle velocity measured by hitting an aluminum plate and recording with
+   audacity... appears to be around 80ft/s with the 0.2g BBs I have
+
+ * considering demo application complete
+
+DONE 2014-03-25
+
+ * Implemented ukf_filter from the book with inspiration from the pykalman
+   API, seems much more stable, in that it works as I expect instead of
+   exploding randomly
+
+ * Found another bug that was causing IMU readings to stop and fixed it
+
+DONE 2014-03-24
+
+ * Fixed the worst of the UKF problems, but pykalman seems to be not very
+   numerically robust in general... will probably write one from the book in
+   the end
+
+ * Got the servos to be stable by turning down the D term of their internal PID
+
+ * Made USB not block on transmit
+
+DONE 2014-03-23
+
+ * Integrated gyros into attitude with a 1s bias sampling period at the start,
+   works OK, but drift is too large after a minute or so of operation, will
+   need ongoing corrections or longer bias sampling period
+
+ * Switched joystick to be accumulative with deadband, and made the d-pad
+   adjust in the smallest steps the servo can represent
+
+ * Started work on KF for attitude... having problems that I haven't
+   successfully debugged yet
+
+DONE 2014-03-22
+
+ * Traced AVR watchdogs to USB slowness, looks like current USB implementation
+   can block for >15ms at a time.  With watchdog set much larger, everything
+   works fine.  Will re-work usb_serial.c to not block.
+
+DONE 2014-03-21
+ * Wired up servos to AVR and battery through power distribution board
+ * Updated AVR to get basic serial communication working
+
+ * Something appears to be resetting the AVR firmware occasionally when
+   communicating serially with the servos, need to debug
+
+DONE 2014-03-20
+
+ * Worked towards having AVR communicate serially to servos instead of using
+   donbgu RS232 adapter
+
+DONE 2014-03-19
+ * Constructed prototype power distribution board
+
+DONE 2014-03-18
+ * assembled complete turret
+
+DONE 2014-03-16
+ * Fixed muzzle velocity issue (gearbox wasn't mating to barrel properly)
+ * Ordered parts for perfboard power distribution, including Castle BEC
+
+ * Partially re-assembled turret, awaiting additional M2 screw sizes before
+   completing
+
+ * Wired up MiniIMU v2 to AVR and prepared for mounting in turret
+
+DONE 2014-03-15
+ * Ordered M2x10 and M2x6 screws for AEG and chassis assembly
+ * Made video of operation
+ * Discovered barrel velocity is terrible
+ * Started drafting chassis layout
+
+DONE 2014-03-14
+
+ * Wrote simple application to control turret, laser, agitator, and AEG from
+   joystick
+
+ * Tested at 10ft with the 3'' target... it is plenty feasible to center the
+   laser pointer on the target at that distance using nothing but the 1080p
+   video feed.  I haven't tested to see how much recoil is caused by the AEG
+   mechanism yet (too loud to test much while Cyrus is sleeping)
+
+DONE 2014-03-13
+ * installed camera using aluminum jaws
+ * wired up laser all the way to AVR on breadboard, tested control in firmware
+ * installed EC3 connectors on battery, charger, and motor driver
+ * odroid + C920 work fine
+
+DONE 2014-03-12
+
+ * Assembled AEG turret minus camera, tested servo drivers... seems there is
+   plenty of power for this mass AEG
+
+DONE 2014-03-11
+
+ * mounted prototype turret base to 2x4 and polycarb for testing (still
+   waiting on hardware to assemble full prototype)
+
+DONE 2014-03-10
+ * source up on gitlab.com
+
+DONE 2014-03-09
+ * sent off plates to emachineshop
+
+ * ordered smaller battery, 30mm spacers, charger, and some screws from
+   hobbyking
+
+ * came up with draft approach for mounting turret without chassis
+ * some polycarbonate I have left over + some 2x4s plus a hand drill
+ * ordered from amazon
+ * spacers for around the AEG
+ * M2 plastic washers
+
+DONE 2014-03-06
+ * Iterate on AEG mounting plates
+ * move plates to be 30mm apart
+ * make sure there is a nice place for the scoring LED board on top if needed
+ * verify final mounting clearance with paper version
+
+DONE 2014-03-05
+ * fix camera geometry, both top and bottom surfaces are sloped somewhat
+
+ * make sure all drill holes are large enough to account for +- .25mm
+   tolerance of emachineshop
+
+ * get servo holes to be fixed distance away from plate
+ * switch plates to aluminum thickness
+ * make corners rounded
+ * put holes for spacer supports
+ * determine if there is room for M2 washers between plate and servo bracket
+ * look to reduce mass maybe reduce shroud around barrel
+ * see if anything looks nice which shrouds the agitator motor
+ * ensure adequate mounting location for IMU
+ * re-draw camera jaw, include spacer support holes
+
+DONE 2014-03-04
+ * Re-measure where AEG mounting holes are
+ * ensure that AEG mounting holes line up
+
+
+DONE 2014-03-02
+ * First rough draft of turret freecad model
+
+DONE 2014-03-01
+ * Fired AEG from lipo with motor driver
+
+DONE 2014-02-20
+ * Integrated eventlet with QT in a hacky way
+ * Started building simple GUI to drive servos and show IK
+
+DONE 2014-02-18
+ * Characterized DRS-0101 servo
+ * Assembled mock leg with brackets
+ * Ordered rubber bumper cushion for leg tip from McMcaster
+
+DONE 2014-02-16
+ * Test fired AEG from lab supply
+   * Needed 4.5A before it would run... worked just fine at 5V, higher
+     input voltage would probably need PWM
+   * Ordered pololu motor driver
+
+DONE 2014-02-15
+ * Simulate herkuleX servo physical characteristics
+ * Get physics to be more realistic
+   * the contact point on the mech's legs may be better represented as
+     a sphere?
+   * Figure out what the moments of inertia should likely be for what
+     we're talking about
+ * Ordered test battery
+ * Wrote up work plan
+
+DONE 2014-02-14
+ * Get NUKE and pypose to operate the thing with oracular commands
+   * add subscription support
+   * make pypose gazebo driver read other commands and report those as
+     current pose
+
+DONE 2014-02-02
+ * Switch gazebo_client to using eventlet Event instead of sleeps for
+   cross-coroutine synchronization
+
+DONE 2014-02-01
+ * Most of the physics problem was that rotational inertia needs to be
+   separate specified, as it defaults to something large and independent
+   of the mass you chose.
